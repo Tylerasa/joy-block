@@ -1,14 +1,24 @@
 var express = require("express");
 var app = express();
-var axios = require("axios");
-const res = require("express/lib/response");
-app.use("/", (req, res) => {
+var cors = require("cors");
+require("dotenv").config();
+
+app.use(cors());
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  next();
+});
+
+app.use("/trends", (req, res) => {
   var config = {
     method: "get",
     url: "https://api.twitter.com/1.1/trends/place.json?id=23424824",
     headers: {
-      Authorization:
-        "Bearer AAAAAAAAAAAAAAAAAAAAAH2lbAEAAAAAoTLWB0FqzBbqeueksaqNec6EfCg%3DbTjzLjgOc2nEK2qCaj95exv9l7suRHnxfrMbY2Q6d4UcE379zD",
+      Authorization: `Bearer ${process.env.TWITTER_ACCESS_TOKEN}`,
       "access-control-allow-origin": "*"
     }
   };
@@ -16,7 +26,7 @@ app.use("/", (req, res) => {
   axios(config)
     .then(function(response) {
       console.log(JSON.stringify(response.data));
-      res.json(response.data)
+      res.json(response.data);
     })
     .catch(function(error) {
       console.log(error);
